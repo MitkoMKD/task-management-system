@@ -14,3 +14,5 @@
 /backend/TaskManagementSystem/TaskManagementSystem.Services/bin/Debug/net8.0
 /backend/TaskManagementSystem/TaskManagementSystem.Services/obj
 /.vs
+/backend/TaskManagementSystem/TaskManagementSystem.UnitTests/obj
+/backend/TaskManagementSystem/TaskManagementSystem.UnitTests/bin/Debug/net8.0
