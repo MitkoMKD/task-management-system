@@ -1,0 +1,17 @@
+version: '3.8'
+services:
+  api:
+    build: ./TaskManagementSystem
+    ports:
+      - "44382:44382"
+    networks:
+      - task-network
+  frontend:
+    build: ./frontend/task-management-frontend
+    ports:
+      - "3000:80"
+    networks:
+      - task-network
+networks:
+  task-network:
+    driver: bridge
