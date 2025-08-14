@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using TaskManagementSystem.Models;
 using TaskManagementSystem.Services.Interfaces;
 
@@ -64,6 +65,21 @@ namespace TaskManagementSystem.API.Controllers
             catch (ArgumentException ex)
             {
                 return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost("reorder")]
+        public async Task<IActionResult> Reorder([FromBody] List<TaskEntity> tasks) {
+            if (tasks == null || !tasks.Any()) {
+                return BadRequest("Task list cannot be empty.");
+            }
+
+            try {
+                var success = await _service.ReorderAsync(tasks);
+                return success ? Ok() : StatusCode(500, "An error occurred while reordering tasks.");
+            } catch (DbUpdateException ex) {
+                // Log the exception (e.g., using ILogger)
+                return StatusCode(500, "An error occurred while reordering tasks.");
             }
         }
 

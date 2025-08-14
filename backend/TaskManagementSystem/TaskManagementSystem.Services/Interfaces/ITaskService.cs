@@ -31,6 +31,13 @@ namespace TaskManagementSystem.Services.Interfaces
         Task<TaskEntity> AddAsync(TaskEntity task);
 
         /// <summary>
+        /// Reorder a task.
+        /// </summary>
+        /// <param name="task">Reorder a task.</param>
+        /// <returns>Reordered task.</returns>
+        Task<bool> ReorderAsync(List<TaskEntity> reorderedTasks);
+
+        /// <summary>
         /// Updates an existing task.
         /// </summary>
         /// <param name="id">The ID of the task to update.</param>

@@ -15,6 +15,7 @@ namespace TaskManagementSystem.Repository.Interfaces
         Task<TaskEntity?> GetByIdAsync(int id);
 
         Task<TaskEntity> AddAsync(TaskEntity task);
+        Task<bool> ReorderAsync(List<TaskEntity> reorderedTasks);
 
         Task<bool> UpdateAsync(TaskEntity task);
 

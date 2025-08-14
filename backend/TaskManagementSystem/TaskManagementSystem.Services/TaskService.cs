@@ -57,5 +57,21 @@ namespace TaskManagementSystem.Services
             }
             return await _repository.DeleteAsync(id);
         }
+
+        public async Task<bool> ReorderAsync(List<TaskEntity> reorderedTasks) {
+            
+            if (reorderedTasks == null || reorderedTasks.Count == 0)
+            {
+                return false;
+            }
+            foreach (var task in reorderedTasks)
+            {
+                if (task.Id <= 0 || string.IsNullOrWhiteSpace(task.Title))
+                {
+                    return false;
+                }
+            }
+            return await _repository.ReorderAsync(reorderedTasks);
+        }
     }
 }

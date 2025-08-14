@@ -1,85 +1,87 @@
-import { createContext, useState, useEffect } from 'react';
-import axios from 'axios';
+import { useContext, useEffect, useState } from 'react';
+import { TaskContext } from '../context/TaskContext';
+import { useParams, useNavigate } from 'react-router-dom';
+import { Button, Form, InputGroup } from 'react-bootstrap';
 
-export const TaskContext = createContext();
+const TaskForm = () => {
+  const { addTask, updateTask, tasks } = useContext(TaskContext);
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [task, setTask] = useState({ title: '', description: '', isCompleted: false });
+  const [validated, setValidated] = useState(false);
 
-const fetchTasks = async (filter, setTasks, setError) => {
-  const url = filter === 'all' ? '/api/Tasks' : `/api/Tasks?status=${filter}`;
-  try {
-    const res = await axios.get(`https://localhost:44382${url}`);
-    setTasks(res.data);
-    setError(null);
-  } catch (err) {
-    console.error('Fetch tasks error:', err);
-    setError('Failed to fetch tasks. Please check if the backend server is running.');
-  }
-};
-
-export const TaskProvider = ({ children }) => {
-  const [tasks, setTasks] = useState([]);
-  const [filter, setFilter] = useState('all');
-  const [error, setError] = useState(null);
-
+  // Load existing task if editing
   useEffect(() => {
-    fetchTasks(filter, setTasks, setError);
-  }, [filter]); // Only filter is a dependency
-
-  const addTask = async (task) => {
-    try {
-      const res = await axios.post('https://localhost:44382/api/Tasks', task);
-      setTasks([...tasks, res.data]);
-      setError(null);
-    } catch (err) {
-      console.error('Add task error:', err);
-      setError('Failed to add task.');
+    if (id) {
+      const existing = tasks.find((t) => t.id === parseInt(id));
+      if (existing) setTask(existing);
     }
-  };
+  }, [id, tasks]);
 
-  const updateTask = async (id, updatedTask) => {
-    try {
-      updatedTask.UpdatedAt = new Date();
-      updatedTask.id = id;
-      await axios.put(`https://localhost:44382/api/Tasks/${id}`, updatedTask);
-      fetchTasks(filter, setTasks, setError);
-      setError(null);
-    } catch (err) {
-      console.error('Update task error:', err);
-      setError('Failed to update task.');
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const form = e.currentTarget;
+    if (form.checkValidity() === false) {
+      e.stopPropagation();
+      setValidated(true);
+      return;
     }
+    if (id) updateTask(id, task);
+    else addTask(task);
+    navigate('/');
   };
-
-  const deleteTask = async (id) => {
-    try {
-      await axios.delete(`https://localhost:44382/api/Tasks/${id}`);
-      fetchTasks(filter, setTasks, setError);
-      setError(null);
-    } catch (err) {
-      console.error('Delete task error:', err);
-      setError('Failed to delete task.');
-    }
-  };
-
-  const toggleComplete = async (id, isCompleted) => {
-    try {
-      const updatedTask = {
-        isCompleted: !isCompleted,
-        id: id,
-        title: tasks.find(task => task.id === id).title,
-        description: tasks.find(task => task.id === id).description
-      }
-      await updateTask(id, updatedTask);
-      setError(null);
-    } catch (err) {
-      console.error('Toggle complete error:', err);
-      setError('Failed to toggle task completion.');
-    }
-  };
-  
 
   return (
-    <TaskContext.Provider value={{ tasks, addTask, updateTask, deleteTask, toggleComplete, setFilter, error }}>
-      {children}
-    </TaskContext.Provider>
+    <Form noValidate validated={validated} onSubmit={handleSubmit} className="p-4 border rounded shadow-sm bg-light">
+      {/* Title Input */}
+      <Form.Group controlId="formTaskTitle" className="mb-3">
+        <Form.Label>Title</Form.Label>
+        <InputGroup hasValidation>
+          <Form.Control
+            type="text"
+            value={task.title}
+            onChange={(e) => setTask({ ...task, title: e.target.value })}
+            placeholder="Enter task title"
+            required
+            isInvalid={!task.title.trim()}
+          />
+          <Form.Control.Feedback type="invalid">
+            Please provide a title.
+          </Form.Control.Feedback>
+        </InputGroup>
+      </Form.Group>
+
+      {/* Description Textarea */}
+      <Form.Group controlId="formTaskDescription" className="mb-3">
+        <Form.Label>Description</Form.Label>
+        <Form.Control
+          as="textarea"
+          rows={3}
+          value={task.description}
+          onChange={(e) => setTask({ ...task, description: e.target.value })}
+          placeholder="Enter task description"
+        />
+      </Form.Group>
+
+      {/* Buttons */}
+      <div className="d-flex gap-2">
+        <Button
+          type="submit"
+          variant={id ? 'warning' : 'primary'}
+          className="w-100"
+        >
+          {id ? 'Update' : 'Add'} Task
+        </Button>
+        <Button
+          variant="secondary"
+          onClick={() => navigate('/')}
+          className="w-100"
+        >
+          Cancel
+        </Button>
+      </div>
+    </Form>
   );
 };
-export default TaskProvider;
+
+export default TaskForm;

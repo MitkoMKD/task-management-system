@@ -13,5 +13,6 @@ namespace TaskManagementSystem.Models
         public bool IsCompleted { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
+        public int? Position { get; set; }
     }
 }

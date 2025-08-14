@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 using TaskManagementSystem.Data;
 using TaskManagementSystem.Models;
 using TaskManagementSystem.Repository.Interfaces;
@@ -67,6 +68,30 @@ namespace TaskManagementSystem.Repository
             _context.Tasks.Remove(task);
             await _context.SaveChangesAsync();
             return true;
+        }
+
+        public async Task<bool> ReorderAsync(List<TaskEntity> reorderedTasks) {
+            // Validate that all IDs exist in the database
+            try {
+                var taskIds = reorderedTasks.Select(t => t.Id).ToList();
+                var existingTasks = await _context.Tasks.Where(t => taskIds.Contains(t.Id)).ToListAsync();
+
+                if (existingTasks.Count != reorderedTasks.Count) {
+                    throw new Exception("One or more task IDs are invalid.");
+                }
+
+                // Update positions
+                for (int i = 0; i < reorderedTasks.Count; i++) {
+                    var task = existingTasks.First(t => t.Id == reorderedTasks[i].Id);
+                    task.Position = reorderedTasks[i].Position; // Update position
+                }
+
+                await _context.SaveChangesAsync();
+                return true;
+            } catch (Exception ex) {
+                // Log the exception or handle it as needed
+                throw new Exception("An error occurred while reordering tasks.", ex);
+            }            
         }
     }
 }
