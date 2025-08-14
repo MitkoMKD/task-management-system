@@ -8,16 +8,18 @@ export const TaskProvider = ({ children }) => {
   const [tasks, setTasks] = useState([]);
   const [filter, setFilter] = useState('all');
   const [error, setError] = useState(null);
-  const { credentials, isAuthenticated } = useAuth();
+  const { user } = useAuth(); // Changed from credentials/isAuthenticated to user
 
   const axiosInstance = axios.create({
     baseURL: 'https://localhost:44382',
   });
 
   const addAuthHeader = (config) => {
-    if (isAuthenticated && credentials.username && credentials.password) {
-      const base64Credentials = btoa(`${credentials.username}:${credentials.password}`);
-      config.headers.Authorization = `Basic ${base64Credentials}`;
+    if (user) { // Now checking for user existence
+      const token = localStorage.getItem('token');
+      if (token) {
+        config.headers.Authorization = `Basic ${token}`;
+      }
     }
     return config;
   };
@@ -25,10 +27,11 @@ export const TaskProvider = ({ children }) => {
   axiosInstance.interceptors.request.use(addAuthHeader, (error) => Promise.reject(error));
 
   const fetchTasks = useCallback(async () => {
-    if (!isAuthenticated) {
+    if (!user) { // Changed from isAuthenticated to user check
       setError('Please log in to view tasks.');
       return;
     }
+    
     const url = filter === 'all' ? '/api/Tasks' : `/api/Tasks?status=${filter}`;
     try {
       const res = await axiosInstance.get(url);
@@ -38,14 +41,14 @@ export const TaskProvider = ({ children }) => {
       console.error('Fetch tasks error:', err);
       setError('Failed to fetch tasks. Check authentication or server.');
     }
-  }, [filter, isAuthenticated, axiosInstance]); // Added axiosInstance to dependency array
+  }, [filter, user, axiosInstance]);
 
   useEffect(() => {
     fetchTasks();
   }, [fetchTasks]);
 
   const addTask = async (task) => {
-    if (!isAuthenticated) {
+    if (!user) {
       setError('Please log in to add tasks.');
       return;
     }
@@ -60,7 +63,7 @@ export const TaskProvider = ({ children }) => {
   };
 
   const updateTask = async (id, updatedTask) => {
-    if (!isAuthenticated) {
+    if (!user) {
       setError('Please log in to update tasks.');
       return;
     }
@@ -75,7 +78,7 @@ export const TaskProvider = ({ children }) => {
   };
 
   const deleteTask = async (id) => {
-    if (!isAuthenticated) {
+    if (!user) {
       setError('Please log in to delete tasks.');
       return;
     }
@@ -106,7 +109,17 @@ export const TaskProvider = ({ children }) => {
   };
   
   return (
-    <TaskContext.Provider value={{ tasks, setTasks, addTask, updateTask, deleteTask, toggleComplete, setFilter, error, filter }}>
+    <TaskContext.Provider value={{ 
+      tasks, 
+      setTasks, 
+      addTask, 
+      updateTask, 
+      deleteTask, 
+      toggleComplete, 
+      setFilter, 
+      error, 
+      filter 
+    }}>
       {children}
     </TaskContext.Provider>
   );

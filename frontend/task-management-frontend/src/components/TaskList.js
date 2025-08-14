@@ -1,17 +1,37 @@
 import { useContext } from 'react';
 import { TaskContext } from '../context/TaskContext';
-import { Link } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button, Card, Form, Table } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-
 const TaskList = () => {
   const { tasks, deleteTask, toggleComplete, setFilter, error, filter } = useContext(TaskContext);
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
   return (
     <div className="container mt-5">
-      <h1 className="mb-4 text-center text-primary">Tasks</h1>
+      <div className="d-flex justify-content-between align-items-center mb-3">
+        <h1 className="mb-0 text-primary">Tasks</h1>
+        {user && (
+          <Button 
+            variant="outline-danger" 
+            onClick={handleLogout}
+            className="ms-2"
+          >
+            Logout ({user.username})
+          </Button>
+        )}
+      </div>
+      
       {error && <div className="alert alert-danger mb-4">{error}</div>}
+      
       <div className="d-flex justify-content-between align-items-center mb-4">
         <Form.Select
           value={filter}
@@ -27,6 +47,7 @@ const TaskList = () => {
           Add Task
         </Link>
       </div>
+      
       <Table striped bordered hover responsive>
         <thead>
           <tr>
