@@ -16,3 +16,4 @@
 /.vs
 /backend/TaskManagementSystem/TaskManagementSystem.UnitTests/obj
 /backend/TaskManagementSystem/TaskManagementSystem.UnitTests/bin/Debug/net8.0
+/backend/TaskManagementSystem/.vs/ProjectEvaluation
