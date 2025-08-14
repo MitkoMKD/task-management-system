@@ -5,6 +5,8 @@
   import Login from './components/Login';
   import { TaskProvider } from './context/TaskContext';
 import { AuthProvider } from './context/AuthContext';
+import 'bootstrap/dist/css/bootstrap.min.css';
+
 
   function App() {
     return (

@@ -2,6 +2,8 @@ import { useContext } from 'react';
 import { TaskContext } from '../context/TaskContext';
 import { Link } from 'react-router-dom';
 import { Button, Card, Form, Table } from 'react-bootstrap';
+import 'bootstrap/dist/css/bootstrap.min.css';
+
 
 const TaskList = () => {
   const { tasks, deleteTask, toggleComplete, setFilter, error, filter } = useContext(TaskContext);
