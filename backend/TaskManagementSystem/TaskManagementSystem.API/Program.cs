@@ -1,6 +1,5 @@
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
+using TaskManagementSystem.API.CustomMiddlewares;
 using TaskManagementSystem.Data;
 using TaskManagementSystem.Repository;
 using TaskManagementSystem.Repository.Interfaces;
@@ -15,6 +14,8 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddAuthorization();
 
 builder.Services.AddDbContext<TaskContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -44,6 +45,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseCors();
+app.UseBasicAuth();
 app.UseAuthorization();
 
 app.MapControllers();
