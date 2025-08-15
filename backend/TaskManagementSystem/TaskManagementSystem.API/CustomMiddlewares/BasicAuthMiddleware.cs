@@ -6,9 +6,6 @@ namespace TaskManagementSystem.API.CustomMiddlewares {
     public class BasicAuthMiddleware {
         private readonly RequestDelegate _next;
 
-        private const string ValidUsername = "admin";
-    private const string ValidPassword = "password123"; // Hardcoded for simplicity
-
         public BasicAuthMiddleware(RequestDelegate next) {
             _next = next;
         }
